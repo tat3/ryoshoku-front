@@ -39,9 +39,9 @@ class DailyMenu extends React.Component<Props> {
             { menu.date }
           </Typography>
           <Typography variant="body2" component="p">
-            { menu.breakfast.exists ? menu.breakfast.content : 'お休み'}
+            朝食: { menu.breakfast.exists ? menu.breakfast.content : 'お休み'}
             <br />
-            { menu.dinner.exists ? menu.dinner.content : 'お休み'}
+            夕食: { menu.dinner.exists ? menu.dinner.content : 'お休み'}
           </Typography>
         </CardContent>
       </Card>
