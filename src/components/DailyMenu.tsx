@@ -49,14 +49,13 @@ class DailyMenu extends React.Component<Props> {
     const menu = this.props.menu
     const date = moment(menu.date)
     const day = date.day()
-    console.log(day)
     return (
       <Card className={classes.card}>
         <CardActionArea>
           <CardContent>
             <Typography className={
               day === 0 ? classes.sundayTitle :
-              day === 1 ? classes.saturdayTitle : classes.weekdayTitle
+              day === 6 ? classes.saturdayTitle : classes.weekdayTitle
               } gutterBottom>
               { date.format('MM/DD') }({ jaWeekday(date.day()) })
             </Typography>
