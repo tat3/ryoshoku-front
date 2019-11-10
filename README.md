@@ -1,8 +1,8 @@
 # Ryoshoku front
 
-とある寮の食堂のメニューを表示するツール
+とある寮の食堂のメニューを表示するWebサービスを管理するリポジトリ
 
-http://ryoshoku.tk
+https://ryoshoku.tk
 
 ## Usage 
 
