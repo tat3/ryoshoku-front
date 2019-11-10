@@ -4,8 +4,10 @@ import { WithStyles } from "@material-ui/core"
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import moment from 'moment'
 
 import { DailySchedule } from '../types'
+import { jaWeekday } from '../util'
 
 const styles = (theme: Theme) => ({
   card: {
@@ -36,7 +38,7 @@ class DailyMenu extends React.Component<Props> {
       <Card className={classes.card}>
         <CardContent>
           <Typography className={classes.title} color="textSecondary" gutterBottom>
-            { menu.date }
+            { moment(menu.date).format('MM/DD') }({ jaWeekday(moment(menu.date).day()) })
           </Typography>
           <Typography variant="body2" component="p">
             朝食: { menu.breakfast.exists ? menu.breakfast.content : 'お休み'}
