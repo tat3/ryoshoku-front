@@ -34,11 +34,12 @@ class DailyMenu extends React.Component<Props> {
   render () {
     const classes = this.props.classes
     const menu = this.props.menu
+    const date = moment(menu.date)
     return (
       <Card className={classes.card}>
         <CardContent>
           <Typography className={classes.title} color="textSecondary" gutterBottom>
-            { moment(menu.date).format('MM/DD') }({ jaWeekday(moment(menu.date).day()) })
+            { date.format('MM/DD') }({ jaWeekday(date.day()) })
           </Typography>
           <Typography variant="body2" component="p">
             朝食: { menu.breakfast.exists ? menu.breakfast.content : 'お休み'}

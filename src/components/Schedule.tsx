@@ -1,9 +1,11 @@
 import React from 'react'
 import axios from 'axios'
+import { Theme, withStyles, WithStyles } from '@material-ui/core'
+import moment from 'moment'
 
 import { MonthlySchedule } from '../types'
 import DailyMenu from './DailyMenu'
-import { Theme, withStyles, WithStyles } from '@material-ui/core'
+import { isTodayOrFuture } from '../util'
 
 const styles = (theme: Theme) => ({
   list: {
@@ -30,9 +32,10 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
 
   render () {
     const { classes } = this.props
+    const today = moment()
     return (
       <ul className={classes.list}>
-        { this.state.schedule.slice(0, 7).map((s, i) => (
+        { this.state.schedule.filter(s => isTodayOrFuture(moment(s.date), today)).slice(0, 7).map((s, i) => (
             <li key={i} className={classes.listItem}><DailyMenu menu={s} /></li>
           )) }
       </ul>
