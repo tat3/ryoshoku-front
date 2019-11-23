@@ -28,7 +28,7 @@ export default function ButtonAppBar() {
             <RestaurantMenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Ryoshoku.tk
+            Ryoshoku
           </Typography>
         </Toolbar>
       </AppBar>
