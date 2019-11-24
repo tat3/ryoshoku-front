@@ -12,7 +12,6 @@ const styles = (theme: Theme) => ({
   list: {
     padding: 0,
     margin: 0,
-    marginBottom: theme.spacing(SPACE)
   },
   listItem: {
     listStyleType: 'none',
