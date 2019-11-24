@@ -1,6 +1,6 @@
 import React from 'react'
 import { withStyles, Theme } from '@material-ui/core/styles';
-import { WithStyles, CardActionArea } from "@material-ui/core"
+import { WithStyles } from "@material-ui/core"
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -51,21 +51,19 @@ interface Props extends WithStyles<typeof styles>{
 class DailyMenu extends React.Component<Props> {
   card = (classes: Record<any, string>, menu: Menu, type: string) => (
     <Card className={classes.card}>
-      <CardActionArea>
-        <CardContent>
-          <Typography component='h3' variant='subtitle2' className={classes.typeName} style={{fontWeight: 'bold'}}>
-            { type === BREAKFAST ? '朝食' : '夕食' }
+      <CardContent>
+        <Typography component='h3' variant='subtitle2' className={classes.typeName} style={{fontWeight: 'bold'}}>
+          { type === BREAKFAST ? '朝食' : '夕食' }
+        </Typography>
+        <Typography component="p" variant="subtitle1" className={classes.menu}>
+          { menu.exists ? menu.content : 'お休み'}
+        </Typography>
+        { menu.exists ? menu.contents.subs.filter(s => !['ご飯', 'ご飯orパン', '野菜サラダ', '味噌汁'].includes(s)).map(sub => (
+          <Typography component="p" variant="body2" color="textSecondary" className={classes.menu}>
+            { sub }
           </Typography>
-          <Typography component="p" variant="subtitle1" className={classes.menu}>
-            { menu.exists ? menu.content : 'お休み'}
-          </Typography>
-          { menu.exists ? menu.contents.subs.map(sub => (
-            <Typography component="p" variant="body2" color="textSecondary" className={classes.menu}>
-              { sub }
-            </Typography>
-          )) : ''}
-        </CardContent>
-      </CardActionArea>
+        )) : ''}
+      </CardContent>
     </Card>
   )
 
