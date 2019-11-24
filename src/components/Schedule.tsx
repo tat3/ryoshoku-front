@@ -6,16 +6,17 @@ import moment from 'moment'
 import { MonthlySchedule } from '../types'
 import DailyMenu from './DailyMenu'
 import { isTodayOrFuture } from '../util'
+import { SPACE } from '../defaultStyles'
 
 const styles = (theme: Theme) => ({
   list: {
     padding: 0,
     margin: 0,
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(SPACE)
   },
   listItem: {
     listStyleType: 'none',
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(SPACE)
   }
 })
 
