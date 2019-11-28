@@ -17,12 +17,8 @@ const styles = (theme: Theme) => ({
     listStyleType: 'none',
     marginTop: theme.spacing(SPACE)
   },
-  limit: {
-  },
   limitText: {
-    // borderTop: 'solid 1px',
     margin: `${theme.spacing(SPACE)}px 0 0`,
-    // paddingTop: theme.spacing(SPACE),
     fontSize: 10,
     color: '#FF0000'
   }
@@ -32,13 +28,11 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
 
   state = {
     schedule: [] as MonthlySchedule,
-    indexOfCancelableBar: -1,
-    now: moment() as moment.Moment
+    indexOfCancelableBar: 100000,
   }
 
   async componentDidMount() {
     const now = moment()
-    this.setState({now})
 
     const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
     const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
@@ -51,7 +45,7 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
   updateCancelables() {
     let count = 0
     let index = 0
-    const now = this.state.now
+    const now = moment()
     if (now.isBefore(now.clone().hour(9).minute(30))){
       count++
     }
