@@ -74,7 +74,7 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
       <ul className={classes.list}>
         { this.state.schedule.slice(0, 7).map((s, i) => (
             <li key={i} className={classes.listItem}>
-              { this.state.indexOfCancelableBar <= i ? (
+              { this.state.indexOfCancelableBar <= i && (s.breakfast.exists || s.dinner.exists) ? (
                 <Typography className={classes.limitText} align='left'>キャンセル可</Typography>
               ) : ''}
               <DailyMenu menu={s} />
