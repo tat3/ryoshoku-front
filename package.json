@@ -26,6 +26,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "startprod": "react-scripts build && serve -s build",
     "eject": "react-scripts eject"
   },
   "browserslist": {
