@@ -46,7 +46,7 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
     let count = 0
     let index = 0
     const now = moment()
-    if (now.isBefore(now.clone().hour(9).minute(30))){
+    if (now.isBefore(now.clone().hour(8).minute(45))){
       count++
     }
     this.state.schedule.forEach(daily => {
