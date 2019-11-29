@@ -11,7 +11,7 @@ const history = createBrowserHistory()
 
 const { NODE_ENV } = process.env
 
-if (NODE_ENV === 'development') {
+if (NODE_ENV === 'production') {
   ReactGA.initialize(process.env.REACT_APP_GA as string)
   history.listen(({ pathname }) => {
     ReactGA.set({ page: pathname });
