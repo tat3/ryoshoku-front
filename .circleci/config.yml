@@ -43,7 +43,7 @@ jobs:
           command: yarn
       - run:
           name: store menu.json
-          command: 'wget https://ryoshoku.tk/menu.json -o public/'
+          command: 'wget https://ryoshoku.tk/menu.json -o public/menu.json'
       - run:
           name: start application
           command: yarn start &
@@ -58,7 +58,7 @@ jobs:
           at: /tmp/app
       - run:
           name: 'menu.jsonを保存する'
-          command: 'wget https://ryoshoku.tk/menu.json -o /tmp/app/build/'
+          command: 'wget https://ryoshoku.tk/menu.json -o /tmp/app/build/menu.json'
       - aws-s3/sync:
           from: /tmp/app/build
           to: 's3://ryoshoku.tk'
