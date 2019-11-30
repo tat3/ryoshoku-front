@@ -26,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "startprod": "react-scripts build && serve -s build",
+    "testci": "nightwatch e2etest",
+    "wait": "wait-on",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -40,5 +41,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "chromedriver": "^78.0.1",
+    "nightwatch": "^1.3.1",
+    "wait-on": "^3.3.0"
   }
 }
