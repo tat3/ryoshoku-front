@@ -12,6 +12,14 @@ filter_only_develop: &filter_only_develop
     branches:
       only: develop
 
+commands:
+  upgrade-builtin-chrome:
+    steps:
+      - run: wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      - run: sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+      - run: sudo apt update
+      - run: sudo apt --only-upgrade install google-chrome-stable
+
 jobs:
   build:
     docker:
@@ -34,19 +42,21 @@ jobs:
             - build
   prepare-deploy:
     docker:
-      - image: circleci/node:12.9.1
+      - image: circleci/node:12.9.1-browsers
     working_directory: ~/app
     steps:
       - checkout
+      - upgrade-builtin-chrome
       - run:
           name: setup environment
           command: yarn
       - run:
           name: store menu.json
-          command: 'wget https://ryoshoku.tk/menu.json -o public/menu.json'
+          command: 'curl https://ryoshoku.tk/menu.json > public/menu.json'
       - run:
           name: start application
-          command: yarn start &
+          command: yarn start
+          background: true
       - run:
           name: test before deploy
           command: yarn wait http://localhost:3000 && yarn testci
@@ -58,7 +68,7 @@ jobs:
           at: /tmp/app
       - run:
           name: 'menu.jsonを保存する'
-          command: 'wget https://ryoshoku.tk/menu.json -o /tmp/app/build/menu.json'
+          command: 'curl https://ryoshoku.tk/menu.json > /tmp/app/build/menu.json'
       - aws-s3/sync:
           from: /tmp/app/build
           to: 's3://ryoshoku.tk'
