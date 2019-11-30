@@ -7,6 +7,11 @@ filter_only_master: &filter_only_master
     branches:
       only: master
 
+filter_only_develop: &filter_only_develop
+  filters:
+    branches:
+      only: develop
+
 jobs:
   build:
     docker:
@@ -27,6 +32,24 @@ jobs:
           root: /tmp/app
           paths:
             - build
+  prepare-deploy:
+    docker:
+      - image: circleci/node:12.9.1
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run:
+          name: setup environment
+          command: yarn
+      - run:
+          name: store menu.json
+          command: 'wget https://ryoshoku.tk/menu.json -o public/'
+      - run:
+          name: start application
+          command: yarn start &
+      - run:
+          name: test before deploy
+          command: yarn wait http://localhost:3000 && yarn testci
   deploy:
     docker:
       - image: 'circleci/python:2.7'
@@ -35,7 +58,7 @@ jobs:
           at: /tmp/app
       - run:
           name: 'menu.jsonを保存する'
-          command: 'curl http://ryoshoku.tk/menu.json > /tmp/app/build/menu.json'
+          command: 'wget https://ryoshoku.tk/menu.json -o /tmp/app/build/'
       - aws-s3/sync:
           from: /tmp/app/build
           to: 's3://ryoshoku.tk'
@@ -48,6 +71,10 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - prepare-deploy:
+          <<: *filter_only_develop
+          requires:
+            - build
       - deploy:
           <<: *filter_only_master
           requires:
