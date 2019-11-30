@@ -19,6 +19,17 @@ commands:
       - run: sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
       - run: sudo apt update
       - run: sudo apt --only-upgrade install google-chrome-stable
+  setup-node-env:
+    steps:
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: update libraries
+          command: yarn
+      - save_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
 
 jobs:
   build:
@@ -27,9 +38,7 @@ jobs:
     working_directory: ~/app
     steps:
       - checkout
-      - run:
-          name: setup environment
-          command: yarn
+      - setup-node-env
       - run:
           name: build
           command: yarn build
@@ -47,9 +56,7 @@ jobs:
     steps:
       - checkout
       - upgrade-builtin-chrome
-      - run:
-          name: setup environment
-          command: yarn
+      - setup-node-env
       - run:
           name: store menu.json
           command: 'curl https://ryoshoku.tk/menu.json > public/menu.json'
