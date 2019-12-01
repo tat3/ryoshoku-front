@@ -8,5 +8,6 @@ https://ryoshoku.tk
 
 ```
 $ yarn
+$ curl https://ryoshoku.tk/menu.json > public/menu.json
 $ yarn run start
 ```
