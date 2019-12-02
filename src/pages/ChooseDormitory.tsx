@@ -3,6 +3,7 @@ import { Theme, WithStyles, withStyles, Typography, Button, Box } from '@materia
 
 import { Dormitory, Dormitories } from '../types/dormitory'
 import { SPACE } from '../defaultStyles'
+import { IDormitoryRepository } from '../services/DormitoryRepository';
 
 const HEIGHT = 50
 
@@ -30,7 +31,11 @@ const styles = (theme: Theme) => ({
   }
 })
 
-class ChooseDormitory extends React.Component<WithStyles<typeof styles>> {
+interface Props extends WithStyles<typeof styles> {
+  dormitoryRepository: IDormitoryRepository
+}
+
+class ChooseDormitory extends React.Component<Props> {
   button = (classes: Record<any, string>, dormitory: Dormitory, isActive: boolean) => (
     <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth>
       { dormitory.name }

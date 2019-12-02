@@ -6,6 +6,7 @@ import { Theme, withStyles, WithStyles } from '@material-ui/core';
 import { SPACE } from './defaultStyles'
 import Home from './pages/Home'
 import ChooseDormitory from './pages/ChooseDormitory'
+import { DormitoryRepositoryWithLocalStorage } from './services/DormitoryRepository'
 
 const styles = (theme: Theme) => ({
   root: {
@@ -25,7 +26,9 @@ class App extends React.Component<WithStyles<typeof styles>> {
         <BrowserRouter>
           <Container maxWidth="sm" className={classes.container}>
             <Route exact path='/' component={Home} />
-            <Route exact path='/dormitory' component={ChooseDormitory} />
+            <Route exact path='/dormitory'>
+              <ChooseDormitory dormitoryRepository={new DormitoryRepositoryWithLocalStorage()}/>
+            </Route>
           </Container>
         </BrowserRouter>
       </div>
