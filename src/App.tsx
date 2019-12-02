@@ -1,10 +1,10 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
+import { BrowserRouter, Route } from 'react-router-dom'
 import TopBar from './components/TopBar'
-import Schedule from './components/Schedule'
 import { Theme, withStyles, WithStyles } from '@material-ui/core';
 import { SPACE } from './defaultStyles'
-import MdLink from './components/MdLink';
+import Home from './pages/Home'
 
 const styles = (theme: Theme) => ({
   root: {
@@ -21,10 +21,11 @@ class App extends React.Component<WithStyles<typeof styles>> {
     return (
       <div className={classes.root}>
         <TopBar />
-        <Container maxWidth="sm" className={classes.container}>
-          <Schedule />
-          <MdLink />
-        </Container>
+        <BrowserRouter>
+          <Container maxWidth="sm" className={classes.container}>
+            <Route exact path='/' component={Home} />
+          </Container>
+        </BrowserRouter>
       </div>
     )
   }
