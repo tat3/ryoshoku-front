@@ -1,38 +1,65 @@
 import React from 'react';
-import { Theme, WithStyles, withStyles, Typography, Card, CardActionArea, CardContent } from '@material-ui/core';
+import { Theme, WithStyles, withStyles, Typography, Button, Box } from '@material-ui/core';
 
-import { Dormitory, Wakabishi1, Wakabishi2, RiverHills } from '../types/dormitory'
+import { Dormitory, Dormitories } from '../types/dormitory'
+import { SPACE } from '../defaultStyles'
+
+const HEIGHT = 50
 
 const styles = (theme: Theme) => ({
-  card: {},
-  typeName: {}
+  button: {
+    height: HEIGHT
+  },
+  text: {
+    marginTop: theme.spacing(SPACE)
+  },
+  dormitory: {
+    marginTop: theme.spacing(SPACE),
+  },
+  saveButton: {
+    width: `calc(50% - ${theme.spacing(SPACE * 0.5)}px)`,
+    height: HEIGHT
+  },
+  cancelButton: {
+    marginLeft: theme.spacing(SPACE),
+    width: `calc(50% - ${theme.spacing(SPACE * 0.5)}px)`,
+    height: HEIGHT
+  },
+  buttons: {
+    marginTop: theme.spacing(SPACE) * 2
+  }
 })
 
 class ChooseDormitory extends React.Component<WithStyles<typeof styles>> {
-  card = (classes: Record<any, string>, dormitory: Dormitory) => (
-    <Card className={classes.card}>
-      <CardActionArea>
-        <CardContent>
-          <Typography component='h3' variant='subtitle2' className={classes.typeName}>
-            { dormitory.name }
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+  button = (classes: Record<any, string>, text: string, isActive: boolean) => (
+    <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth>
+      { text }
+    </Button>
   )
   render () {
     const { classes } = this.props
     return (
       <div>
-        <Typography>
-          現在の設定
+        <Typography className={classes.text}>
+          寮を選択してください
         </Typography>
-        { this.card(classes, Wakabishi1) }
-        <Typography>
-          寮を変更する場合は以下から選択してください
-        </Typography>
-        { this.card(classes, Wakabishi2) }
-        { this.card(classes, RiverHills) }
+        { Dormitories.map((dormitory, i) => (
+          <div className={classes.dormitory}>
+            { this.button(classes, dormitory.name, i === 0) }
+          </div>
+        ))}
+        <Box display='flex' flexDirection='row' className={classes.buttons}>
+          <div className={classes.saveButton}>
+            <Button variant='contained' color='primary' fullWidth className={classes.button}>
+              Save
+            </Button>
+          </div>
+          <div className={classes.cancelButton}>
+            <Button variant='contained' color='default' fullWidth className={classes.button}>
+              Cancel
+            </Button>
+          </div>
+        </Box>
       </div>
     )
   }

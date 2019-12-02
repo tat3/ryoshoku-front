@@ -17,3 +17,12 @@ export const RiverHills: Dormitory = {
   name: 'リバーヒルズ寮',
   mdurl: ''
 }
+
+export const Taihei: Dormitory = {
+  name: '太平寮',
+  mdurl: ''
+}
+
+export const Dormitories = [
+  Wakabishi1, Wakabishi2, RiverHills, Taihei
+]
