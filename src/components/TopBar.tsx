@@ -16,6 +16,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import PlaceIcon from '@material-ui/icons/Place'
+import HomeIcon from '@material-ui/icons/Home'
 
 import theme from '../theme'
 
@@ -47,6 +48,10 @@ const styles = (theme: Theme) => ({
   hide: {
     display: 'none',
   },
+  link: {
+    textDecoration: 'none',
+    color: 'inherit'
+  }
 })
 
 class TopBar extends React.Component<WithStyles<typeof styles>> {
@@ -83,12 +88,17 @@ class TopBar extends React.Component<WithStyles<typeof styles>> {
       </div>
       <Divider />
       <List>
-        <Link to='/dormitory'>
-          <ListItem button key={0} onClick={this.handleDrawerClose}>
-            <ListItemIcon><PlaceIcon /></ListItemIcon>
-            <ListItemText primary='寮の設定' />
-          </ListItem>
-        </Link>
+        { [
+            {text: 'ホーム', link: '/', icon: <HomeIcon />},
+            {text: '寮の設定', link: '/dormitory', icon: <PlaceIcon />},
+          ].map(({text, link, icon}, i) => (
+            <Link to={link} className={classes.link} onClick={this.handleDrawerClose} key={i}>
+              <ListItem button>
+                <ListItemIcon>{ icon }</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            </Link>
+          )) }
       </List>
     </Drawer>
   )
