@@ -31,9 +31,9 @@ const styles = (theme: Theme) => ({
 })
 
 class ChooseDormitory extends React.Component<WithStyles<typeof styles>> {
-  button = (classes: Record<any, string>, text: string, isActive: boolean) => (
+  button = (classes: Record<any, string>, dormitory: Dormitory, isActive: boolean) => (
     <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth>
-      { text }
+      { dormitory.name }
     </Button>
   )
   render () {
@@ -44,8 +44,8 @@ class ChooseDormitory extends React.Component<WithStyles<typeof styles>> {
           寮を選択してください
         </Typography>
         { Dormitories.map((dormitory, i) => (
-          <div className={classes.dormitory}>
-            { this.button(classes, dormitory.name, i === 0) }
+          <div className={classes.dormitory} key={i}>
+            { this.button(classes, dormitory, i === 0) }
           </div>
         ))}
         <Box display='flex' flexDirection='row' className={classes.buttons}>
