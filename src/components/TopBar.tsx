@@ -1,5 +1,6 @@
 import React from 'react'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { Link } from 'react-router-dom'
+import { Theme, withStyles, WithStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
@@ -16,9 +17,11 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import PlaceIcon from '@material-ui/icons/Place'
 
+import theme from '../theme'
+
 const drawerWidth = 240
 
-const useStyles = makeStyles(theme => ({
+const styles = (theme: Theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -44,67 +47,76 @@ const useStyles = makeStyles(theme => ({
   hide: {
     display: 'none',
   },
-}))
+})
 
-export default function ButtonAppBar() {
-  const classes = useStyles()
-  const theme = useTheme()
-  const [open, setOpen] = React.useState(false)
-
-  const handleDrawerOpen = () => {
-    setOpen(true)
+class TopBar extends React.Component<WithStyles<typeof styles>> {
+  state = {
+    open: false
   }
 
-  const handleDrawerClose = () => {
-    setOpen(false)
+  setOpen = (open: boolean) => {
+    this.setState({open})
   }
 
-  const handleToDormitoryPage = () => {
+  handleDrawerOpen = () => {
+    this.setOpen(true)
   }
-  const drawer = () => (
+
+  handleDrawerClose = () => {
+    this.setOpen(false)
+  }
+
+  drawer = (classes: Record<any, string>, theme: Theme) => (
     <Drawer
       className={classes.drawer}
       variant="persistent"
       anchor="left"
-      open={open}
+      open={this.state.open}
       classes={{
         paper: classes.drawerPaper,
       }}
     >
       <div className={classes.drawerHeader}>
-        <IconButton onClick={handleDrawerClose}>
+        <IconButton onClick={this.handleDrawerClose}>
           {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>
       </div>
       <Divider />
       <List>
-        <ListItem button key={0} onClick={handleToDormitoryPage}>
+        <Link to='/dormitory'>
+          <ListItem button key={0} onClick={this.handleDrawerClose}>
             <ListItemIcon><PlaceIcon /></ListItemIcon>
             <ListItemText primary='寮の設定' />
-        </ListItem>
+          </ListItem>
+        </Link>
       </List>
     </Drawer>
   )
 
-  return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Ryoshoku
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      { drawer() }
-    </div>
-  )
+  render () {
+    const { classes } = this.props
+    return (
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={this.handleDrawerOpen}
+              edge="start"
+              className={clsx(classes.menuButton, this.state.open && classes.hide)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" className={classes.title}>
+              Ryoshoku
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        { this.drawer(classes, theme) }
+      </div>
+    )
+  }
 }
+
+export default withStyles(styles)(TopBar)

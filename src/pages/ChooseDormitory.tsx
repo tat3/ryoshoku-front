@@ -1,6 +1,7 @@
 import React from 'react';
-import { Theme, WithStyles, withStyles, Typography, Button, Box } from '@material-ui/core';
+import { Theme, WithStyles, withStyles, Typography, Button, Box, Container } from '@material-ui/core';
 
+import TopBar from '../components/TopBar'
 import { Dormitory, Dormitories } from '../types/dormitory'
 import { SPACE } from '../defaultStyles'
 import { IDormitoryRepository } from '../services/DormitoryRepository';
@@ -8,6 +9,9 @@ import { IDormitoryRepository } from '../services/DormitoryRepository';
 const HEIGHT = 50
 
 const styles = (theme: Theme) => ({
+  container: {
+    padding: `0 ${theme.spacing(SPACE)}px ${theme.spacing(SPACE)}px`
+  },
   button: {
     height: HEIGHT
   },
@@ -45,6 +49,8 @@ class ChooseDormitory extends React.Component<Props> {
     const { classes } = this.props
     return (
       <div>
+        <TopBar />
+        <Container maxWidth="sm" className={classes.container}>
         <Typography className={classes.text}>
           寮を選択してください
         </Typography>
@@ -65,6 +71,8 @@ class ChooseDormitory extends React.Component<Props> {
             </Button>
           </div>
         </Box>
+
+        </Container>
       </div>
     )
   }
