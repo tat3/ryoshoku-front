@@ -29,6 +29,7 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
   state = {
     schedule: [] as MonthlySchedule,
     indexOfCancelableBar: 100000,
+    cancelableTimer: 0
   }
 
   async componentDidMount() {
@@ -39,7 +40,12 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
     this.setState({schedule})
 
     this.updateCancelables()
-    setInterval(() => this.updateCancelables(), 1000)
+    const cancelableTimer = window.setInterval(() => this.updateCancelables(), 1000)
+    this.setState({cancelableTimer})
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.cancelableTimer)
   }
 
   updateCancelables() {
