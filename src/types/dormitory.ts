@@ -10,17 +10,17 @@ export const Wakabishi1: Dormitory = {
 
 export const Wakabishi2: Dormitory = {
   name: '第二若菱寮',
-  mdurl: ''
+  mdurl: 'https://www.m-dmeal.com/S-itami013-GwWVCsTujjKUXs9u2UcX_FMCx5MjMj-E/login.aspx?p=mdmealITM013'
 }
 
 export const RiverHills: Dormitory = {
   name: 'リバーヒルズ寮',
-  mdurl: ''
+  mdurl: 'https://www.m-dmeal.com/S-itami004-PFPLfD-LMgAARQR5ZMyGJT7hmikZHU-E/login.aspx?p=mdmealITM004'
 }
 
 export const Taihei: Dormitory = {
   name: '太平寮',
-  mdurl: ''
+  mdurl: 'https://www.m-dmeal.com/S-itami005-SJJbPfBxCBz3k3gMkFuNCX6FDG6nYW-E/login.aspx?p=mdmealITM005'
 }
 
 export const Dormitories = [
