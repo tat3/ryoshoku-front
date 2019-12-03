@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router'
 import { Theme, withStyles, WithStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -54,7 +55,10 @@ const styles = (theme: Theme) => ({
   }
 })
 
-class TopBar extends React.Component<WithStyles<typeof styles>> {
+interface Props extends WithStyles<typeof styles> {
+}
+
+class TopBar extends React.Component<Props & RouteComponentProps> {
   state = {
     open: false
   }
@@ -71,40 +75,8 @@ class TopBar extends React.Component<WithStyles<typeof styles>> {
     this.setOpen(false)
   }
 
-  drawer = (classes: Record<any, string>, theme: Theme) => (
-    <Drawer
-      className={classes.drawer}
-      variant="persistent"
-      anchor="left"
-      open={this.state.open}
-      classes={{
-        paper: classes.drawerPaper,
-      }}
-    >
-      <div className={classes.drawerHeader}>
-        <IconButton onClick={this.handleDrawerClose}>
-          {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
-      </div>
-      <Divider />
-      <List>
-        { [
-            {text: 'ホーム', link: '/', icon: <HomeIcon />},
-            {text: '寮の設定', link: '/dormitory', icon: <PlaceIcon />},
-          ].map(({text, link, icon}, i) => (
-            <Link to={link} className={classes.link} onClick={this.handleDrawerClose} key={i}>
-              <ListItem button>
-                <ListItemIcon>{ icon }</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            </Link>
-          )) }
-      </List>
-    </Drawer>
-  )
-
   render () {
-    const { classes } = this.props
+    const { classes, location } = this.props
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -123,10 +95,39 @@ class TopBar extends React.Component<WithStyles<typeof styles>> {
             </Typography>
           </Toolbar>
         </AppBar>
-        { this.drawer(classes, theme) }
+        <Drawer
+          className={classes.drawer}
+          variant="persistent"
+          anchor="left"
+          open={this.state.open}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <div className={classes.drawerHeader}>
+            <IconButton onClick={this.handleDrawerClose}>
+              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </div>
+          <Divider />
+          <List>
+            { [
+                {text: 'ホーム', link: '/', icon: <HomeIcon />},
+                {text: '寮の設定', link: '/dormitory', icon: <PlaceIcon />},
+              ].filter(item => item.link !== location.pathname)
+                .map(({text, link, icon}, i) => (
+                <Link to={link} className={classes.link} onClick={this.handleDrawerClose} key={i}>
+                  <ListItem button>
+                    <ListItemIcon>{ icon }</ListItemIcon>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                </Link>
+              )) }
+          </List>
+        </Drawer>
       </div>
     )
   }
 }
 
-export default withStyles(styles)(TopBar)
+export default withRouter(withStyles(styles)(TopBar))
