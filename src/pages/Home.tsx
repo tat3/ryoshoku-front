@@ -6,6 +6,7 @@ import { SPACE } from '../defaultStyles'
 import Schedule from '../components/Schedule'
 import MdLink from '../components/MdLink';
 import TopBar from '../components/TopBar'
+import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
 
 const styles = (theme: Theme) => ({
   container: {
@@ -21,7 +22,7 @@ class Home extends React.Component<WithStyles<typeof styles>> {
         <TopBar />
         <Container maxWidth="sm" className={classes.container}>
           <Schedule />
-          <MdLink />
+          <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>
         </Container>
       </div>
     )

@@ -3,6 +3,7 @@ import { Theme, withStyles, WithStyles } from '@material-ui/core'
 import { Button } from '@material-ui/core';
 
 import { SPACE } from '../defaultStyles'
+import { IDormitoryRepository } from '../services/DormitoryRepository';
 
 const styles = (theme: Theme) => ({
   button: {
@@ -12,10 +13,14 @@ const styles = (theme: Theme) => ({
   }
 })
 
-class MdLink extends React.Component<WithStyles<typeof styles>> {
+interface Props extends WithStyles<typeof styles> {
+  dormitoryRepository: IDormitoryRepository
+}
+
+class MdLink extends React.Component<Props> {
   render () {
     const { classes } = this.props
-    const url ='https://www.m-dmeal.com/S-itami008-JYBFE_jpahbXmFsh4m396APWmYEFDN-E/login.aspx?p=mdmealITM008'
+    const url = this.props.dormitoryRepository.getUsersDormitory().mdurl
     return (
       <Button variant='contained' href={url} rel='noreferrer' target='_blank'
        className={classes.button} color='primary'>

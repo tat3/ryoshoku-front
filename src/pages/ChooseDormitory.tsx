@@ -1,10 +1,12 @@
 import React from 'react';
 import { Theme, WithStyles, withStyles, Typography, Button, Box, Container } from '@material-ui/core';
+import { withRouter } from 'react-router-dom'
 
 import TopBar from '../components/TopBar'
 import { Dormitory, Dormitories } from '../types/dormitory'
 import { SPACE } from '../defaultStyles'
 import { IDormitoryRepository } from '../services/DormitoryRepository';
+import { RouteComponentProps } from 'react-router-dom';
 
 const HEIGHT = 50
 
@@ -39,9 +41,28 @@ interface Props extends WithStyles<typeof styles> {
   dormitoryRepository: IDormitoryRepository
 }
 
-class ChooseDormitory extends React.Component<Props> {
+class ChooseDormitory extends React.Component<Props & RouteComponentProps> {
+  state = {
+    usersDormitory: this.props.dormitoryRepository.getUsersDormitory()
+  }
+
+  handleDormitoryButton (dormitory: Dormitory) {
+    this.setState({
+      usersDormitory: dormitory
+    })
+  }
+
+  handleSaveButton = () => {
+    this.props.dormitoryRepository.saveUsersDormitory(this.state.usersDormitory)
+    this.props.history.push('/')
+  }
+
+  handleCancelButton = () => {
+    this.props.history.push('/')
+  }
+
   button = (classes: Record<any, string>, dormitory: Dormitory, isActive: boolean) => (
-    <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth>
+    <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth onClick={() => this.handleDormitoryButton(dormitory)}>
       { dormitory.name }
     </Button>
   )
@@ -56,17 +77,17 @@ class ChooseDormitory extends React.Component<Props> {
         </Typography>
         { Dormitories.map((dormitory, i) => (
           <div className={classes.dormitory} key={i}>
-            { this.button(classes, dormitory, i === 0) }
+            { this.button(classes, dormitory, this.props.dormitoryRepository.isSameDormitory(dormitory, this.state.usersDormitory)) }
           </div>
         ))}
         <Box display='flex' flexDirection='row' className={classes.buttons}>
           <div className={classes.saveButton}>
-            <Button variant='contained' color='primary' fullWidth className={classes.button}>
+            <Button variant='contained' color='primary' fullWidth className={classes.button} onClick={this.handleSaveButton}>
               Save
             </Button>
           </div>
           <div className={classes.cancelButton}>
-            <Button variant='contained' color='default' fullWidth className={classes.button}>
+            <Button variant='contained' color='default' fullWidth className={classes.button} onClick={this.handleCancelButton}>
               Cancel
             </Button>
           </div>
@@ -78,4 +99,4 @@ class ChooseDormitory extends React.Component<Props> {
   }
 }
 
-export default withStyles(styles)(ChooseDormitory)
+export default withRouter(withStyles(styles)(ChooseDormitory))
