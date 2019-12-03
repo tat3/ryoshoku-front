@@ -24,7 +24,11 @@ const styles = (theme: Theme) => ({
   }
 })
 
-class Schedule extends React.Component<WithStyles<typeof styles>> {
+interface Props extends WithStyles<typeof styles>{
+  completeLoading(): void
+}
+
+class Schedule extends React.Component<Props> {
 
   state = {
     schedule: [] as MonthlySchedule,
@@ -38,6 +42,7 @@ class Schedule extends React.Component<WithStyles<typeof styles>> {
     const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
     const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
     this.setState({schedule})
+    this.props.completeLoading()
 
     this.updateCancelables()
     const cancelableTimer = window.setInterval(() => this.updateCancelables(), 1000)

@@ -15,14 +15,24 @@ const styles = (theme: Theme) => ({
 })
 
 class Home extends React.Component<WithStyles<typeof styles>> {
+  state = {
+    loadingScheduleComponent: true
+  }
+
+  completeLoadingSchedule = () => {
+    this.setState({
+      loadingScheduleComponent: false
+    })
+  }
+
   render () {
     const { classes } = this.props
     return (
       <div>
         <TopBar />
         <Container maxWidth="sm" className={classes.container}>
-          <Schedule />
-          <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>
+          <Schedule completeLoading={this.completeLoadingSchedule}/>
+          { this.state.loadingScheduleComponent ? '' : <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>}
         </Container>
       </div>
     )
