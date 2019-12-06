@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 const { NODE_ENV } = process.env
 
 if (NODE_ENV === 'production') {
-  ReactGA.initialize(process.env.REACT_APP_GA as string)
+  ReactGA.initialize(process.env.REACT_APP_GA)
 }
 
 const withTracker = <T, >(WrappedComponent: React.ComponentType<T>, options = {}) => {
