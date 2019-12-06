@@ -4,6 +4,7 @@ import { Theme, withStyles, WithStyles } from '@material-ui/core';
 import Home from './pages/Home'
 import ChooseDormitory from './pages/ChooseDormitory'
 import { DormitoryRepositoryWithLocalStorage } from './services/DormitoryRepository'
+import { withTracker } from './ga'
 
 const styles = (theme: Theme) => ({
   root: {
@@ -17,9 +18,11 @@ class App extends React.Component<WithStyles<typeof styles>> {
     return (
       <div className={classes.root}>
         <BrowserRouter>
-          <Route exact path='/' component={Home} />
-          <Route exact path='/dormitory'>
-            <ChooseDormitory dormitoryRepository={new DormitoryRepositoryWithLocalStorage()}/>
+          <Route exact path='/' component={withTracker(Home)} />
+          <Route exact path='/dormitory' render={(props) => {
+            const Component = withTracker(ChooseDormitory)
+            return (<Component dormitoryRepository={new DormitoryRepositoryWithLocalStorage()} />)
+          }}>
           </Route>
         </BrowserRouter>
       </div>
