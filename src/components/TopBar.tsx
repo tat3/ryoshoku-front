@@ -20,13 +20,17 @@ import PlaceIcon from '@material-ui/icons/Place'
 import HomeIcon from '@material-ui/icons/Home'
 
 import theme from '../theme'
+import { CSSProperties } from '@material-ui/core/styles/withStyles'
+import { useScrollTrigger, Slide } from '@material-ui/core'
 
 const drawerWidth = 240
 
 const styles = (theme: Theme) => ({
   root: {
     flexGrow: 1,
-  },
+    position: "sticky",
+    height: 64,
+  } as CSSProperties,
   menuButton: {
   },
   title: {
@@ -58,6 +62,17 @@ const styles = (theme: Theme) => ({
 interface Props extends WithStyles<typeof styles> {
 }
 
+function HideOnScroll(props: any) {
+  const { children } = props;
+  const trigger = useScrollTrigger();
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
+
 class TopBar extends React.Component<Props & RouteComponentProps> {
   state = {
     open: false
@@ -79,7 +94,8 @@ class TopBar extends React.Component<Props & RouteComponentProps> {
     const { classes, location } = this.props
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <HideOnScroll { ...this.props }>
+        <AppBar>
           <Toolbar>
             <IconButton
               color="inherit"
@@ -95,6 +111,7 @@ class TopBar extends React.Component<Props & RouteComponentProps> {
             </Typography>
           </Toolbar>
         </AppBar>
+        </HideOnScroll>
         <Drawer
           className={classes.drawer}
           variant="persistent"
