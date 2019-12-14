@@ -7,6 +7,11 @@ import { MonthlySchedule } from '../types'
 import DailyMenu from './DailyMenu'
 import { isTodayOrFuture } from '../util'
 import { SPACE } from '../defaultStyles'
+import { CSSProperties } from '@material-ui/core/styles/withStyles'
+
+const refreshThreshold = 60
+
+const isPulled = (scroll: number) => -scroll > refreshThreshold
 
 const styles = (theme: Theme) => ({
   list: {
@@ -21,11 +26,48 @@ const styles = (theme: Theme) => ({
     margin: `${theme.spacing(SPACE)}px 0 0`,
     fontSize: 10,
     color: '#FF0000'
-  }
+  },
+  pulled: {
+    marginTop: -refreshThreshold,
+    paddingTop: 20,
+    height: refreshThreshold,
+    textAlign: 'center'
+  } as CSSProperties,
+  loading: {
+    paddingTop: 20,
+    height: refreshThreshold,
+    textAlign: 'center'
+  } as CSSProperties,
 })
 
 interface Props extends WithStyles<typeof styles>{
-  completeLoading(): void
+  completeLoading(isLoaded: boolean): void
+}
+
+interface PullToRefreshAreaProps extends WithStyles<typeof styles>{
+  message: string
+}
+
+class PullToRefreshArea extends React.Component<PullToRefreshAreaProps> {
+  render = () => {
+    const { message, classes } = this.props
+    return (
+      <div className={classes.pulled}>
+        <Typography color='textSecondary' variant='subtitle2'>{ message }</Typography>
+      </div>
+    )
+  }
+}
+
+class LoadingArea extends React.Component<WithStyles<typeof styles>> {
+  render = () => {
+    const { classes } = this.props
+    return (
+      <div className={classes.loading}>
+        <img src='/image.gif' alt='loading' />
+      </div>
+    )
+  }
 }
 
 class Schedule extends React.Component<Props> {
@@ -33,16 +75,25 @@ class Schedule extends React.Component<Props> {
   state = {
     schedule: [] as MonthlySchedule,
     indexOfCancelableBar: 100000,
-    cancelableTimer: 0
+    cancelableTimer: 0,
+    scroll: 0,
+    refreshMessage: 'Pull to Refresh',
+    isPulled: false,
+    isTouched: false,
+    isLoading: false,
   }
 
   async componentDidMount() {
+    window.addEventListener('scroll', this.handleScrolled)
+    window.addEventListener('touchstart', this.handleTouched)
+    window.addEventListener('touchend', this.handleUntouched)
+
     const now = moment()
 
     const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
     const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
     this.setState({schedule})
-    this.props.completeLoading()
+    this.props.completeLoading(true)
 
     this.updateCancelables()
     const cancelableTimer = window.setInterval(() => this.updateCancelables(), 1000)
@@ -51,6 +102,9 @@ class Schedule extends React.Component<Props> {
 
   componentWillUnmount() {
     clearInterval(this.state.cancelableTimer)
+    window.removeEventListener('scroll', this.handleScrolled)
+    window.removeEventListener('touchstart', this.handleTouched)
+    window.removeEventListener('touchend', this.handleUntouched)
   }
 
   updateCancelables() {
@@ -73,9 +127,57 @@ class Schedule extends React.Component<Props> {
     this.setState({indexOfCancelableBar: index})
   }
 
+  async handleRefresh () {
+    this.setState({isLoading: true})
+    this.props.completeLoading(false)
+
+    const now = moment()
+    const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
+    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    this.setState({schedule, isLoading: false})
+    this.props.completeLoading(true)
+  }
+
+  handleScrolled = () => {
+    const scroll = window.pageYOffset
+    this.setState({scroll})
+
+    if (isPulled(scroll)) {
+      this.setState({
+        isPulled: true,
+        refreshMessage: 'Now Loading...'
+      })
+      // this.handleRefresh()
+    } else if (this.state.isLoading) {
+      this.setState({
+        isPulled: false,
+        refreshMessage: ''
+      })
+    } else {
+      this.setState({
+        isPulled: false,
+        refreshMessage: 'Pull to Refresh'
+      })
+    }
+  }
+
+  handleTouched = () => {
+    this.setState({isTouched: true})
+  }
+
+  handleUntouched = () => {
+    this.setState({isTouched: false, refreshMessage: ''})
+    if (isPulled(this.state.scroll)) {
+      this.handleRefresh()
+    }
+  }
+
   render () {
     const { classes } = this.props
     return (
+      <div>
+      <PullToRefreshArea message={this.state.refreshMessage} classes={classes}/>
+      { this.state.isLoading ? <LoadingArea classes={classes} /> : 
       <ul className={classes.list}>
         { this.state.schedule.slice(0, 7).map((s, i) => (
             <li key={i} className={classes.listItem}>
@@ -86,6 +188,8 @@ class Schedule extends React.Component<Props> {
             </li>
           )) }
       </ul>
+      }
+      </div>
     )
   }
 }

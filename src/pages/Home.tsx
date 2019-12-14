@@ -7,29 +7,45 @@ import Schedule from '../components/Schedule'
 import MdLink from '../components/MdLink';
 import TopBar from '../components/TopBar'
 import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
+import MenuDrawer from '../components/MenuDrawer';
 
 const styles = (theme: Theme) => ({
   container: {
-    padding: `0 ${theme.spacing(SPACE)}px ${theme.spacing(SPACE)}px`
+    padding: `0 ${theme.spacing(SPACE)}px ${theme.spacing(SPACE)}px`,
+    overscrollBehavior: 'contain'
+  },
+  loading: {
+    width: 50,
+    height: 'auto',
   }
 })
 
 class Home extends React.Component<WithStyles<typeof styles>> {
   state = {
-    loadingScheduleComponent: true
+    loadingScheduleComponent: true,
+    drawerIsOpen: false,
   }
 
-  completeLoadingSchedule = () => {
+  completeLoadingSchedule = (isLoaded: boolean) => {
     this.setState({
-      loadingScheduleComponent: false
+      loadingScheduleComponent: !isLoaded
     })
+  }
+
+  handleMenuClicked = () => {
+    this.setState({drawerIsOpen: true})
+  }
+
+  handleDrawerClosed = () => {
+    this.setState({drawerIsOpen: false})
   }
 
   render () {
     const { classes } = this.props
     return (
       <div>
-        <TopBar />
+        <TopBar open={this.state.drawerIsOpen} handleMenuClicked={this.handleMenuClicked}/>
+        <MenuDrawer open={this.state.drawerIsOpen} handleMenuDrawerClosed={this.handleDrawerClosed}/>
         <Container maxWidth="sm" className={classes.container}>
           <Schedule completeLoading={this.completeLoadingSchedule}/>
           { this.state.loadingScheduleComponent ? '' : <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>}
