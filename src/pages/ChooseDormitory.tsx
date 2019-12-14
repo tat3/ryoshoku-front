@@ -1,12 +1,12 @@
 import React from 'react';
 import { Theme, WithStyles, withStyles, Typography, Button, Box, Container } from '@material-ui/core';
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import TopBar from '../components/TopBar'
 import { Dormitory, Dormitories } from '../types/dormitory'
 import { SPACE } from '../defaultStyles'
 import { IDormitoryRepository } from '../services/DormitoryRepository';
-import { RouteComponentProps } from 'react-router-dom';
+import MenuDrawer from '../components/MenuDrawer';
 
 const HEIGHT = 50
 
@@ -43,7 +43,8 @@ interface Props extends WithStyles<typeof styles> {
 
 class ChooseDormitory extends React.Component<Props & RouteComponentProps> {
   state = {
-    usersDormitory: this.props.dormitoryRepository.getUsersDormitory()
+    usersDormitory: this.props.dormitoryRepository.getUsersDormitory(),
+    drawerIsOpen: false,
   }
 
   handleDormitoryButton (dormitory: Dormitory) {
@@ -61,6 +62,14 @@ class ChooseDormitory extends React.Component<Props & RouteComponentProps> {
     this.props.history.push('/')
   }
 
+  handleMenuClicked = () => {
+    this.setState({drawerIsOpen: true})
+  }
+
+  handleDrawerClosed = () => {
+    this.setState({drawerIsOpen: false})
+  }
+
   button = (classes: Record<any, string>, dormitory: Dormitory, isActive: boolean) => (
     <Button className={classes.button} variant={isActive ? 'contained' : 'outlined'} fullWidth onClick={() => this.handleDormitoryButton(dormitory)}>
       { dormitory.name }
@@ -70,7 +79,8 @@ class ChooseDormitory extends React.Component<Props & RouteComponentProps> {
     const { classes } = this.props
     return (
       <div>
-        <TopBar />
+        <TopBar open={this.state.drawerIsOpen} handleMenuClicked={this.handleMenuClicked}/>
+        <MenuDrawer open={this.state.drawerIsOpen} handleMenuDrawerClosed={this.handleDrawerClosed}/>
         <Container maxWidth="sm" className={classes.container}>
         <Typography className={classes.text}>
           寮を選択してください
