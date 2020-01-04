@@ -13,6 +13,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import PlaceIcon from '@material-ui/icons/Place'
 import HomeIcon from '@material-ui/icons/Home'
+import LockIcon from '@material-ui/icons/Lock'
 
 import theme from '../theme'
 
@@ -76,6 +77,7 @@ class MenuDrawer extends React.Component<Props & RouteComponentProps> {
             { [
                 {text: 'ホーム', link: '/', icon: <HomeIcon />},
                 {text: '寮の設定', link: '/dormitory', icon: <PlaceIcon />},
+                {text: 'ログイン', link: '/signin', icon: <LockIcon />},
               ].filter(item => item.link !== location.pathname)
                 .map(({text, link, icon}, i) => (
                 <Link to={link} className={classes.link} onClick={this.props.handleMenuDrawerClosed} key={i}>
