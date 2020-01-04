@@ -2,7 +2,7 @@ import { IUser, IUserRepository } from '../types/user'
 import { User, AnonymousUser } from '../models/User'
 
 export class MockUserRepository implements IUserRepository {
-  saveUser(dormitory: IUser) {}
+  saveUser(user: IUser) {}
 
   getStoredUser() {
     return new AnonymousUser()
@@ -11,6 +11,9 @@ export class MockUserRepository implements IUserRepository {
 
 export class UserRepositoryWithLocalStorage implements IUserRepository {
   saveUser(user: IUser) {
+    if (user.isAnonymous()) {
+      return
+    }
     localStorage.setItem('user', JSON.stringify({
       usernameToken: user.usernameToken,
       passwordToken: user.passwordToken,
