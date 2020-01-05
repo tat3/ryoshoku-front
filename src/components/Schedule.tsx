@@ -9,6 +9,7 @@ import { isTodayOrFuture } from '../util'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
 import { UserRepositoryWithLocalStorage } from '../services/UserRepository'
+import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
 
 const refreshThreshold = 60
 
@@ -140,10 +141,12 @@ class Schedule extends React.Component<Props> {
     if (user.isAnonymous()) {
       return
     }
+    const dormitory = (new DormitoryRepositoryWithLocalStorage()).getUsersDormitory()
     const url = process.env.REACT_APP_API_URL + '/orders'
     const scheduleAll: MonthlySchedule = (await axios.post(url, {
       username: user.usernameToken,
-      password: user.passwordToken
+      password: user.passwordToken,
+      dormitory: dormitory.key,
     })).data.schedule
 
     const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
