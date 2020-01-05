@@ -1,5 +1,6 @@
 import { IUser, IUserRepository } from '../types/user'
 import { User, AnonymousUser } from '../models/User'
+import { DormitoryRepositoryWithLocalStorage } from './DormitoryRepository'
 
 export class MockUserRepository implements IUserRepository {
   saveUser(user: IUser) {}
@@ -31,6 +32,7 @@ export class UserRepositoryWithLocalStorage implements IUserRepository {
     if (!(typeof usernameToken === 'string' && typeof passwordToken === 'string')) {
       return new AnonymousUser()
     }
-    return new User(usernameToken, passwordToken, this)
+    const dormitory = (new DormitoryRepositoryWithLocalStorage()).getUsersDormitory()
+    return new User(usernameToken, passwordToken, dormitory, this)
   }
 }
