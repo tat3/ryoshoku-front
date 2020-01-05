@@ -1,11 +1,14 @@
 import axios from 'axios'
 
 import { IUser, IUserRepository } from '../types/user'
+import { Dormitory } from '../types/dormitory'
 
 class User implements IUser {
   private isAuthenticated = false
 
-  constructor(public usernameToken: string, public passwordToken: string, private repository: IUserRepository) {
+  constructor(
+    public usernameToken: string, public passwordToken: string,
+    private dormitory: Dormitory, private repository: IUserRepository) {
   }
 
   async authenticate() {
@@ -14,6 +17,7 @@ class User implements IUser {
       const res = await axios.post(url, {
         username: this.usernameToken,
         password: this.passwordToken,
+        dormitory: this.dormitory.key,
       })
       if (!res.data.authenticated) {
         throw Error()

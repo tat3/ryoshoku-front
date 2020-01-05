@@ -90,7 +90,7 @@ class Signin extends React.Component<Props & RouteComponentProps> {
       await user.authenticate()
     } catch (e) {
       this.setState({isAuthenticating: false})
-      alert('ログインIDかパスワードが間違っています')
+      alert('ログインIDかパスワードが間違っています。もしくは寮の設定が間違っています。')
       return
     }
 
