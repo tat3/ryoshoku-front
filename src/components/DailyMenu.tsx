@@ -1,6 +1,6 @@
 import React from 'react'
 import { withStyles, Theme } from '@material-ui/core/styles';
-import { WithStyles } from "@material-ui/core"
+import { WithStyles, Button } from "@material-ui/core"
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -46,7 +46,11 @@ const styles = (theme: Theme) => ({
   },
   right: {
     marginLeft: theme.spacing(SPACE)
-  }
+  },
+  orderButton: {
+    marginTop: theme.spacing(SPACE),
+    padding: 0,
+  },
 })
 
 interface Props extends WithStyles<typeof styles>{
@@ -68,6 +72,9 @@ class DailyMenu extends React.Component<Props> {
             { sub }
           </Typography>
         )) : ''}
+        { menu.ordered === null ?
+            <Button className={classes.orderButton}> </Button> :
+            <Button className={classes.orderButton} variant='outlined' color='primary'>{ menu.ordered ? '喫食' : '欠食' }</Button> }
       </CardContent>
     </Card>
   )

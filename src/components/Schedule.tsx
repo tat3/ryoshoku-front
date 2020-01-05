@@ -8,6 +8,7 @@ import DailyMenu from './DailyMenu'
 import { isTodayOrFuture } from '../util'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
+import { UserRepositoryWithLocalStorage } from '../services/UserRepository'
 
 const refreshThreshold = 60
 
@@ -88,16 +89,13 @@ class Schedule extends React.Component<Props> {
     window.addEventListener('touchstart', this.handleTouched)
     window.addEventListener('touchend', this.handleUntouched)
 
-    const now = moment()
-
-    const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
-    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
-    this.setState({schedule})
+    await this.loadStaticSchedule()
     this.props.completeLoading(true)
 
     this.updateCancelables()
     const cancelableTimer = window.setInterval(() => this.updateCancelables(), 1000)
     this.setState({cancelableTimer})
+    this.loadScheduleWithOrderStatus()
   }
 
   componentWillUnmount() {
@@ -127,14 +125,37 @@ class Schedule extends React.Component<Props> {
     this.setState({indexOfCancelableBar: index})
   }
 
+  async loadStaticSchedule() {
+    const now = moment()
+    const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
+    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    this.setState({schedule})
+  }
+
+  async loadScheduleWithOrderStatus () {
+    const now = moment()
+
+    const userRepository = new UserRepositoryWithLocalStorage()
+    const user = userRepository.getStoredUser()
+    if (user.isAnonymous()) {
+      return
+    }
+    const url = process.env.REACT_APP_API_URL + '/orders'
+    const scheduleAll: MonthlySchedule = (await axios.post(url, {
+      username: user.usernameToken,
+      password: user.passwordToken
+    })).data.schedule
+
+    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    this.setState({schedule})
+  }
+
   async handleRefresh () {
     this.setState({isLoading: true})
     this.props.completeLoading(false)
 
-    const now = moment()
-    const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
-    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
-    this.setState({schedule, isLoading: false})
+    await this.loadStaticSchedule()
+    this.setState({isLoading: false})
     this.props.completeLoading(true)
   }
 

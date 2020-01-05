@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   aws-s3: circleci/aws-s3@1.0.11
+  aws-parameter-store: circleci/aws-parameter-store@1.0.0
 
 filter_only_master: &filter_only_master
   filters:
@@ -39,6 +40,12 @@ jobs:
     steps:
       - checkout
       - setup-node-env
+      - aws-parameter-store/load:
+          filter: Key=Name,Values=ryoshoku_pub_key
+      - run:
+          command: |
+            source /tmp/parameterstore/PARAMETERSTORESOURCEFILE && \
+            echo REACT_APP_PUBLIC_KEY=${ryoshoku_pub_key} > .env
       - run:
           name: build
           command: yarn build

@@ -3,6 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom'
 import { Theme, withStyles, WithStyles } from '@material-ui/core';
 import Home from './pages/Home'
 import ChooseDormitory from './pages/ChooseDormitory'
+import Signin from './pages/Signin'
 import { DormitoryRepositoryWithLocalStorage } from './services/DormitoryRepository'
 import { withTracker } from './ga'
 
@@ -24,6 +25,7 @@ class App extends React.Component<WithStyles<typeof styles>> {
             return (<Component dormitoryRepository={new DormitoryRepositoryWithLocalStorage()} />)
           }}>
           </Route>
+          <Route exact path='/signin' component={withTracker(Signin)} />
         </BrowserRouter>
       </div>
     )

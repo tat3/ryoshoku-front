@@ -14,7 +14,6 @@ const drawerWidth = 240
 const styles = (theme: Theme) => ({
   root: {
     flexGrow: 1,
-    position: 'sticky',
     height: 64,
   } as CSSProperties,
   menuButton: {
