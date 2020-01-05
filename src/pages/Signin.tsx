@@ -1,6 +1,7 @@
 import React from 'react'
 import { Theme, WithStyles, withStyles, Typography, Button, Box, Container, TextField } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { CSSProperties } from '@material-ui/core/styles/withStyles'
 
 import TopBar from '../components/TopBar'
 import { SPACE } from '../defaultStyles'
@@ -33,7 +34,13 @@ const styles = (theme: Theme) => ({
     height: HEIGHT
   },
   buttons: {
-    marginTop: theme.spacing(SPACE) * 2
+    marginTop: theme.spacing(SPACE)
+  },
+  loadingContainer: {
+    textAlign: 'center',
+  } as CSSProperties,
+  loading: {
+    marginTop: theme.spacing(SPACE),
   }
 })
 
@@ -45,6 +52,7 @@ class Signin extends React.Component<Props & RouteComponentProps> {
     drawerIsOpen: false,
     username: '',
     password: '',
+    isAuthenticating: false,
   }
 
   handleCancelButton = () => {
@@ -69,9 +77,11 @@ class Signin extends React.Component<Props & RouteComponentProps> {
 
   handleSubmit = async (event: any) => {
     event.preventDefault()
+    this.setState({isAuthenticating: true})
     const { username, password } = this.state
     if (!(username && password)) {
-      console.log('username and password is required')
+      this.setState({isAuthenticating: false})
+      alert('ログインIDとパスワードは必須です')
       return
     }
 
@@ -79,13 +89,16 @@ class Signin extends React.Component<Props & RouteComponentProps> {
     try {
       await user.authenticate()
     } catch (e) {
-      alert('username or password is wrong')
+      this.setState({isAuthenticating: false})
+      alert('ログインIDかパスワードが間違っています')
       return
     }
 
     user.save()
-    // this.props.history.push('/')
-    console.log('successfully saved')
+
+    this.setState({isAuthenticating: false})
+    alert('ログインしました')
+    this.props.history.push('/')
   }
 
   render () {
@@ -105,6 +118,7 @@ class Signin extends React.Component<Props & RouteComponentProps> {
           <div className={classes.inputform}>
             <TextField id="password" label="パスワード" variant="outlined" type="password" fullWidth onChange={this.handleInputPassword} />
           </div>
+          { this.state.isAuthenticating ? <div className={classes.loadingContainer}><img className={classes.loading} src='image.gif' alt='authenticating'/></div> : '' }
           <Box display='flex' flexDirection='row' className={classes.buttons}>
             <div className={classes.saveButton}>
               <Button type='submit' variant='contained' color='primary' fullWidth className={classes.button}>

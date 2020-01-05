@@ -28,7 +28,7 @@ export class UserRepositoryWithLocalStorage implements IUserRepository {
     const data = JSON.parse(json)
     const usernameToken = data.usernameToken
     const passwordToken = data.passwordToken
-    if (!(typeof usernameToken !== 'string' && typeof passwordToken !== 'string')) {
+    if (!(typeof usernameToken === 'string' && typeof passwordToken === 'string')) {
       return new AnonymousUser()
     }
     return new User(usernameToken, passwordToken, this)

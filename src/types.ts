@@ -5,7 +5,8 @@ export type Menu = {
   contents: {
     main: string,
     subs: string[]
-  }
+  },
+  ordered: boolean | null,
 }
 
 export type DailySchedule = {
