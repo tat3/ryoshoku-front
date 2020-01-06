@@ -10,6 +10,7 @@ import classNames from 'classnames'
 import { DailySchedule, Menu, BREAKFAST, DINNER } from '../types'
 import { SPACE } from '../defaultStyles'
 import { jaWeekday } from '../util'
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 const styles = (theme: Theme) => ({
   menuContainer: {
@@ -48,9 +49,11 @@ const styles = (theme: Theme) => ({
     marginLeft: theme.spacing(SPACE)
   },
   orderButton: {
-    marginTop: theme.spacing(SPACE),
     padding: 0,
-  },
+    position: 'relative',
+    bottom: 40,
+    left: 12,
+  } as CSSProperties,
 })
 
 interface Props extends WithStyles<typeof styles>{
@@ -72,15 +75,20 @@ class DailyMenu extends React.Component<Props> {
             { sub }
           </Typography>
         )) : ''}
-        { menu.ordered === null ?
-            <Button className={classes.orderButton}> </Button> :
-            <Button className={classes.orderButton} variant='outlined' color='primary'>{ menu.ordered ? '喫食' : '欠食' }</Button> }
       </CardContent>
     </Card>
   )
 
   breakfast = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.breakfast, BREAKFAST)
   dinner = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.dinner, DINNER)
+  orderStatus = (classes: Record<any, string>, menu: Menu) => {
+    return menu.ordered === null ?
+      <Button className={classes.orderButton}> </Button> :
+      <Button className={classes.orderButton} variant='outlined' color='primary'>
+        { menu.ordered ? '喫食' : '欠食' }
+      </Button>
+    }
+
 
   render () {
     const classes = this.props.classes
@@ -99,9 +107,11 @@ class DailyMenu extends React.Component<Props> {
         <div className={classes.menuContainer}>
           <div className={classes.cardContainer}>
             { this.breakfast(classes, menu) }
+            { this.orderStatus(classes, menu.breakfast) }
           </div>
           <div className={classNames(classes.cardContainer, classes.right)}>
             { this.dinner(classes, menu) }
+            { this.orderStatus(classes, menu.dinner) }
           </div>
         </div>
       </div>
