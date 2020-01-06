@@ -160,6 +160,7 @@ class Schedule extends React.Component<Props> {
     await this.loadStaticSchedule()
     this.setState({isLoading: false})
     this.props.completeLoading(true)
+    this.loadScheduleWithOrderStatus()
   }
 
   handleScrolled = () => {
@@ -171,7 +172,6 @@ class Schedule extends React.Component<Props> {
         isPulled: true,
         refreshMessage: 'Now Loading...'
       })
-      // this.handleRefresh()
     } else if (this.state.isLoading) {
       this.setState({
         isPulled: false,
