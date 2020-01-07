@@ -1,7 +1,7 @@
 import axios from 'axios'
 import moment from 'moment'
 
-import { MonthlySchedule, DailyScheduleApi, Menu } from '../types'
+import { MonthlySchedule, DailyScheduleApi, Menu, Order } from '../types'
 import { isTodayOrFuture } from '../util'
 import { Dormitory } from '../types/dormitory'
 import { IUser } from '../types/user'
@@ -12,6 +12,8 @@ export interface IScheduleRepository {
 }
 
 export class ScheduleRepository implements IScheduleRepository {
+  private orderFromMenu = (menu: Menu, loading: boolean): Order => ({ menu, isLoading: loading })
+
   private orderWithLoading = (menu: Menu) => {
     return {
       menu,
@@ -32,8 +34,8 @@ export class ScheduleRepository implements IScheduleRepository {
     return scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
       .map(s => ({
         date: s.date,
-        breakfast: this.orderWithLoading(s.breakfast),
-        dinner: this.orderWithLoading(s.dinner)
+        breakfast: this.orderFromMenu(s.breakfast, loading),
+        dinner: this.orderFromMenu(s.dinner, loading),
       }))
   }
 

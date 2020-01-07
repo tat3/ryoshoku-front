@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import moment from 'moment'
 import classNames from 'classnames'
 
-import { DailySchedule, Menu, BREAKFAST, DINNER } from '../types'
+import { DailySchedule, Menu, BREAKFAST, DINNER, Order } from '../types'
 import { SPACE } from '../defaultStyles'
 import { jaWeekday } from '../util'
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
@@ -52,7 +52,13 @@ const styles = (theme: Theme) => ({
     padding: 0,
     position: 'relative',
     bottom: 40,
-    left: 12,
+    left: 16,
+  } as CSSProperties,
+  loadingButton: {
+    padding: 0,
+    position: 'relative',
+    bottom: 32,
+    left: 24,
   } as CSSProperties,
 })
 
@@ -81,14 +87,28 @@ class DailyMenu extends React.Component<Props> {
 
   breakfast = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.breakfast.menu, BREAKFAST)
   dinner = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.dinner.menu, DINNER)
-  orderStatus = (classes: Record<any, string>, menu: Menu) => {
-    return menu.ordered === null ?
-      <Button className={classes.orderButton}> </Button> :
-      <Button className={classes.orderButton} variant='outlined' color='primary'>
-        { menu.ordered ? '喫食' : '欠食' }
-      </Button>
+
+  orderStatus = (classes: Record<any, string>, order: Order) => {
+    const nothing = (<Button className={classes.orderButton}> </Button>)
+
+    if (!order.menu.exists) {
+      return nothing
     }
 
+    if (order.isLoading) {
+      return (<img className={classes.loadingButton} src='./image.gif' alt='loading'></img>)
+    }
+
+    if (order.menu.ordered === null) {
+      return nothing
+    }
+
+    return (
+      <Button className={classes.orderButton} variant='outlined' color='primary'>
+        { order.menu.ordered ? '喫食' : '欠食' }
+      </Button>
+    )
+  }
 
   render () {
     const classes = this.props.classes
@@ -107,11 +127,11 @@ class DailyMenu extends React.Component<Props> {
         <div className={classes.menuContainer}>
           <div className={classes.cardContainer}>
             { this.breakfast(classes, menu) }
-            { this.orderStatus(classes, menu.breakfast.menu) }
+            { this.orderStatus(classes, menu.breakfast) }
           </div>
           <div className={classNames(classes.cardContainer, classes.right)}>
             { this.dinner(classes, menu) }
-            { this.orderStatus(classes, menu.dinner.menu) }
+            { this.orderStatus(classes, menu.dinner) }
           </div>
         </div>
       </div>
