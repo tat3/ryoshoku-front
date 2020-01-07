@@ -79,8 +79,8 @@ class DailyMenu extends React.Component<Props> {
     </Card>
   )
 
-  breakfast = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.breakfast, BREAKFAST)
-  dinner = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.dinner, DINNER)
+  breakfast = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.breakfast.menu, BREAKFAST)
+  dinner = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.dinner.menu, DINNER)
   orderStatus = (classes: Record<any, string>, menu: Menu) => {
     return menu.ordered === null ?
       <Button className={classes.orderButton}> </Button> :
@@ -107,11 +107,11 @@ class DailyMenu extends React.Component<Props> {
         <div className={classes.menuContainer}>
           <div className={classes.cardContainer}>
             { this.breakfast(classes, menu) }
-            { this.orderStatus(classes, menu.breakfast) }
+            { this.orderStatus(classes, menu.breakfast.menu) }
           </div>
           <div className={classNames(classes.cardContainer, classes.right)}>
             { this.dinner(classes, menu) }
-            { this.orderStatus(classes, menu.dinner) }
+            { this.orderStatus(classes, menu.dinner.menu) }
           </div>
         </div>
       </div>
