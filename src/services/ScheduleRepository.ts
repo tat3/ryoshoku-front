@@ -39,29 +39,6 @@ export class ScheduleRepository implements IScheduleRepository {
       }))
   }
 
-  getStaticScheduleWithLoading = async (): Promise<MonthlySchedule> => {
-    const now = moment()
-    const scheduleAll: DailyScheduleApi[] = (await axios.get('/menu.json')).data
-    return scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
-      .map(s => ({
-        date: s.date,
-        breakfast: this.orderWithLoading(s.breakfast),
-        dinner: this.orderWithLoading(s.dinner)
-      }))
-  }
-
-  getStaticScheduleWithUnloading = async (): Promise<MonthlySchedule> => {
-    const now = moment()
-    const scheduleAll: DailyScheduleApi[] = (await axios.get('/menu.json')).data
-    return scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
-      .map(s => ({
-        date: s.date,
-        breakfast: this.orderWithLoading(s.breakfast),
-        dinner: this.orderWithLoading(s.dinner)
-      }))
-  }
-
-
   getUsersSchedule = async (user: IUser, dormitory: Dormitory): Promise<MonthlySchedule> => {
     if (user.isAnonymous()) {
       throw Error('user is anonymous.')
