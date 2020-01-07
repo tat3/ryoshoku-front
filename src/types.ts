@@ -9,10 +9,21 @@ export type Menu = {
   ordered: boolean | null,
 }
 
+export type Order = {
+  menu: Menu,
+  isLoading: boolean,
+}
+
 export type DailySchedule = {
   date: string,
-  breakfast: Menu, 
-  dinner: Menu
+  breakfast: Order, 
+  dinner: Order,
+}
+
+export type DailyScheduleApi = {
+  date: string,
+  breakfast: Menu,
+  dinner: Menu,
 }
 
 export type MonthlySchedule = DailySchedule[]

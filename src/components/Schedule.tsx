@@ -1,15 +1,14 @@
 import React from 'react'
-import axios from 'axios'
 import { Theme, withStyles, WithStyles, Typography } from '@material-ui/core'
 import moment from 'moment'
 
 import { MonthlySchedule } from '../types'
 import DailyMenu from './DailyMenu'
-import { isTodayOrFuture } from '../util'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
-import { UserRepositoryWithLocalStorage } from '../services/UserRepository'
-import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
+import { IDormitoryRepository } from '../services/DormitoryRepository'
+import { IScheduleRepository } from '../services/ScheduleRepository'
+import { IUserRepository } from '../types/user'
 
 const refreshThreshold = 60
 
@@ -43,7 +42,10 @@ const styles = (theme: Theme) => ({
 })
 
 interface Props extends WithStyles<typeof styles>{
-  completeLoading(isLoaded: boolean): void
+  completeLoading(isLoaded: boolean): void,
+  userRepository: IUserRepository,
+  scheduleRepository: IScheduleRepository,
+  dormitoryRepository: IDormitoryRepository,
 }
 
 interface PullToRefreshAreaProps extends WithStyles<typeof styles>{
@@ -73,6 +75,9 @@ class LoadingArea extends React.Component<WithStyles<typeof styles>> {
 }
 
 class Schedule extends React.Component<Props> {
+  userRepository = this.props.userRepository
+  dormitoryRepository = this.props.dormitoryRepository
+  scheduleRepository = this.props.scheduleRepository
 
   state = {
     schedule: [] as MonthlySchedule,
@@ -117,7 +122,7 @@ class Schedule extends React.Component<Props> {
       if (count === 3) {
         return
       }
-      if (daily.breakfast.exists && daily.dinner.exists) {
+      if (daily.breakfast.menu.exists && daily.dinner.menu.exists) {
         count++
       }
       index++
@@ -127,29 +132,20 @@ class Schedule extends React.Component<Props> {
   }
 
   async loadStaticSchedule() {
-    const now = moment()
-    const scheduleAll: MonthlySchedule = (await axios.get('/menu.json')).data
-    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    const user = this.userRepository.getStoredUser()
+    
+    const willLoading = !user.isAnonymous()
+    const schedule = await this.scheduleRepository.getStaticSchedule(willLoading)
     this.setState({schedule})
   }
 
   async loadScheduleWithOrderStatus () {
-    const now = moment()
-
-    const userRepository = new UserRepositoryWithLocalStorage()
-    const user = userRepository.getStoredUser()
+    const user = this.userRepository.getStoredUser()
     if (user.isAnonymous()) {
       return
     }
-    const dormitory = (new DormitoryRepositoryWithLocalStorage()).getUsersDormitory()
-    const url = process.env.REACT_APP_API_URL + '/orders'
-    const scheduleAll: MonthlySchedule = (await axios.post(url, {
-      username: user.usernameToken,
-      password: user.passwordToken,
-      dormitory: dormitory.key,
-    })).data.schedule
-
-    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    const dormitory = this.dormitoryRepository.getUsersDormitory()
+    const schedule = await this.scheduleRepository.getUsersSchedule(user, dormitory)
     this.setState({schedule})
   }
 
@@ -205,7 +201,7 @@ class Schedule extends React.Component<Props> {
       <ul className={classes.list}>
         { this.state.schedule.slice(0, 7).map((s, i) => (
             <li key={i} className={classes.listItem}>
-              { this.state.indexOfCancelableBar <= i && (s.breakfast.exists || s.dinner.exists) ? (
+              { this.state.indexOfCancelableBar <= i && (s.breakfast.menu.exists || s.dinner.menu.exists) ? (
                 <Typography className={classes.limitText} align='left'>キャンセル可</Typography>
               ) : ''}
               <DailyMenu menu={s} />
