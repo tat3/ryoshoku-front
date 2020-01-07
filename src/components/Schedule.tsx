@@ -6,9 +6,9 @@ import { MonthlySchedule } from '../types'
 import DailyMenu from './DailyMenu'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
-import { UserRepositoryWithLocalStorage } from '../services/UserRepository'
-import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
-import { ScheduleRepository } from '../services/ScheduleRepository'
+import { IDormitoryRepository } from '../services/DormitoryRepository'
+import { IScheduleRepository } from '../services/ScheduleRepository'
+import { IUserRepository } from '../types/user'
 
 const refreshThreshold = 60
 
@@ -42,7 +42,10 @@ const styles = (theme: Theme) => ({
 })
 
 interface Props extends WithStyles<typeof styles>{
-  completeLoading(isLoaded: boolean): void
+  completeLoading(isLoaded: boolean): void,
+  userRepository: IUserRepository,
+  scheduleRepository: IScheduleRepository,
+  dormitoryRepository: IDormitoryRepository,
 }
 
 interface PullToRefreshAreaProps extends WithStyles<typeof styles>{
@@ -72,6 +75,9 @@ class LoadingArea extends React.Component<WithStyles<typeof styles>> {
 }
 
 class Schedule extends React.Component<Props> {
+  userRepository = this.props.userRepository
+  dormitoryRepository = this.props.dormitoryRepository
+  scheduleRepository = this.props.scheduleRepository
 
   state = {
     schedule: [] as MonthlySchedule,
@@ -126,27 +132,20 @@ class Schedule extends React.Component<Props> {
   }
 
   async loadStaticSchedule() {
-    const userRepository = new UserRepositoryWithLocalStorage()
-    const scheduleRepository = new ScheduleRepository()
-
-    const user = userRepository.getStoredUser()
+    const user = this.userRepository.getStoredUser()
     
     const willLoading = !user.isAnonymous()
-    const schedule = await scheduleRepository.getStaticSchedule(willLoading)
+    const schedule = await this.scheduleRepository.getStaticSchedule(willLoading)
     this.setState({schedule})
   }
 
   async loadScheduleWithOrderStatus () {
-    const userRepository = new UserRepositoryWithLocalStorage()
-    const dormitoryRepository = new DormitoryRepositoryWithLocalStorage()
-    const scheduleRepository = new ScheduleRepository()
-
-    const user = userRepository.getStoredUser()
+    const user = this.userRepository.getStoredUser()
     if (user.isAnonymous()) {
       return
     }
-    const dormitory = dormitoryRepository.getUsersDormitory()
-    const schedule = await scheduleRepository.getUsersSchedule(user, dormitory)
+    const dormitory = this.dormitoryRepository.getUsersDormitory()
+    const schedule = await this.scheduleRepository.getUsersSchedule(user, dormitory)
     this.setState({schedule})
   }
 

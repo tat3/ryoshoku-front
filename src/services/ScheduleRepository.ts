@@ -6,7 +6,12 @@ import { isTodayOrFuture } from '../util'
 import { Dormitory } from '../types/dormitory'
 import { IUser } from '../types/user'
 
-export class ScheduleRepository {
+export interface IScheduleRepository {
+  getStaticSchedule(isLoading: boolean): Promise<MonthlySchedule>,
+  getUsersSchedule(user: IUser, dormitory: Dormitory): Promise<MonthlySchedule>,
+}
+
+export class ScheduleRepository implements IScheduleRepository {
   private orderWithLoading = (menu: Menu) => {
     return {
       menu,

@@ -8,6 +8,8 @@ import MdLink from '../components/MdLink';
 import TopBar from '../components/TopBar'
 import { DormitoryRepositoryWithLocalStorage } from '../services/DormitoryRepository'
 import MenuDrawer from '../components/MenuDrawer';
+import { UserRepositoryWithLocalStorage } from '../services/UserRepository';
+import { ScheduleRepository } from '../services/ScheduleRepository';
 
 const styles = (theme: Theme) => ({
   container: {
@@ -47,7 +49,12 @@ class Home extends React.Component<WithStyles<typeof styles>> {
         <TopBar open={this.state.drawerIsOpen} handleMenuClicked={this.handleMenuClicked}/>
         <MenuDrawer open={this.state.drawerIsOpen} handleMenuDrawerClosed={this.handleDrawerClosed}/>
         <Container maxWidth="sm" className={classes.container}>
-          <Schedule completeLoading={this.completeLoadingSchedule}/>
+          <Schedule
+            completeLoading={this.completeLoadingSchedule}
+            dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }
+            userRepository={ new UserRepositoryWithLocalStorage() }
+            scheduleRepository={ new ScheduleRepository() }
+          />
           { this.state.loadingScheduleComponent ? '' : <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>}
         </Container>
       </div>
