@@ -65,6 +65,7 @@ const styles = (theme: Theme) => ({
 interface Props extends WithStyles<typeof styles>{
   menu: DailySchedule,
   handleOrderChanged(name: string, order: Order): void,
+  cancelable: boolean,
 }
 
 class DailyMenu extends React.Component<Props> {
@@ -106,11 +107,11 @@ class DailyMenu extends React.Component<Props> {
     }
     const oldOrder = name === BREAKFAST ? this.props.menu.breakfast : this.props.menu.dinner
     const order = {
+      ...oldOrder,
       menu: {
         ...Object.assign({}, oldOrder.menu),
         ordered: !oldOrder.menu.ordered,
       },
-      isLoading: oldOrder.isLoading,
     }
     this.props.handleOrderChanged(name, order)
   }
@@ -131,7 +132,7 @@ class DailyMenu extends React.Component<Props> {
     }
 
     return (
-      <Button className={classes.orderButton} variant='outlined' color='primary' onClick={this.handleOrderButtonClicked(name)}>
+      <Button className={classes.orderButton} variant={this.props.cancelable ? 'contained' : 'outlined'} color='primary' onClick={this.handleOrderButtonClicked(name)}>
         { order.menu.ordered ? '喫食' : '欠食' }
       </Button>
     )
