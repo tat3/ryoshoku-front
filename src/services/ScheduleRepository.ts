@@ -14,13 +14,6 @@ export interface IScheduleRepository {
 export class ScheduleRepository implements IScheduleRepository {
   private orderFromMenu = (menu: Menu, loading: boolean): Order => ({ menu, isLoading: loading })
 
-  private orderWithLoading = (menu: Menu) => {
-    return {
-      menu,
-      isLoading: true,
-    }
-  }
-
   private orderWithUnloading = (menu: Menu) => {
     return {
       menu,

@@ -2,7 +2,7 @@ import React from 'react'
 import { Theme, withStyles, WithStyles, Typography } from '@material-ui/core'
 import moment from 'moment'
 
-import { MonthlySchedule } from '../types'
+import { MonthlySchedule, Order, BREAKFAST, DINNER } from '../types'
 import DailyMenu from './DailyMenu'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
@@ -88,6 +88,7 @@ class Schedule extends React.Component<Props> {
     isPulled: false,
     isTouched: false,
     isLoading: false,
+    orderChanged: false,
   }
 
   async componentDidMount() {
@@ -192,6 +193,23 @@ class Schedule extends React.Component<Props> {
     }
   }
 
+  handleOrderChanged = (idx: number) => (name: string, order: Order) => {
+    if (![BREAKFAST, DINNER].includes(name)) {
+      return
+    }
+
+    const newSchedule = this.state.schedule.slice()
+    newSchedule[idx] = Object.assign({}, newSchedule[idx])
+    if (name === BREAKFAST) {
+      newSchedule[idx].breakfast = order
+    } else {
+      newSchedule[idx].dinner = order
+    }
+
+    this.setState({schedule: newSchedule})
+    this.setState({orderChanged: true})
+  }
+
   render () {
     const { classes } = this.props
     return (
@@ -204,7 +222,7 @@ class Schedule extends React.Component<Props> {
               { this.state.indexOfCancelableBar <= i && (s.breakfast.menu.exists || s.dinner.menu.exists) ? (
                 <Typography className={classes.limitText} align='left'>キャンセル可</Typography>
               ) : ''}
-              <DailyMenu menu={s} />
+              <DailyMenu menu={s} handleOrderChanged={this.handleOrderChanged(i)}/>
             </li>
           )) }
       </ul>
