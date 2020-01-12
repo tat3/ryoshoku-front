@@ -26,6 +26,7 @@ class Home extends React.Component<WithStyles<typeof styles>> {
   state = {
     loadingScheduleComponent: true,
     drawerIsOpen: false,
+    orderChanged: false,
   }
 
   completeLoadingSchedule = (isLoaded: boolean) => {
@@ -55,6 +56,7 @@ class Home extends React.Component<WithStyles<typeof styles>> {
             userRepository={ new UserRepositoryWithLocalStorage() }
             scheduleRepository={ new ScheduleRepository() }
           />
+          { this.state.orderChanged ? <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/> : '' }
           { this.state.loadingScheduleComponent ? '' : <MdLink dormitoryRepository={ new DormitoryRepositoryWithLocalStorage() }/>}
         </Container>
       </div>

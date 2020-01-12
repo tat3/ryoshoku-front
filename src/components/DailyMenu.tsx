@@ -64,6 +64,8 @@ const styles = (theme: Theme) => ({
 
 interface Props extends WithStyles<typeof styles>{
   menu: DailySchedule,
+  handleOrderChanged(name: string, order: Order): void,
+  cancelable: boolean,
 }
 
 class DailyMenu extends React.Component<Props> {
@@ -85,10 +87,36 @@ class DailyMenu extends React.Component<Props> {
     </Card>
   )
 
-  breakfast = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.breakfast.menu, BREAKFAST)
-  dinner = (classes: Record<any, string>, daily: DailySchedule) => this.card(classes, daily.dinner.menu, DINNER)
+  breakfast = (classes: Record<any, string>, daily: DailySchedule) => (
+    <div className={classes.cardContainer}>
+      { this.card(classes, daily.breakfast.menu, BREAKFAST) }
+      { this.orderStatus(classes, daily.breakfast, BREAKFAST) }
+    </div>
+  )
 
-  orderStatus = (classes: Record<any, string>, order: Order) => {
+  dinner = (classes: Record<any, string>, daily: DailySchedule) => (
+    <div className={classNames(classes.cardContainer, classes.right)}>
+      { this.card(classes, daily.dinner.menu, DINNER) }
+      { this.orderStatus(classes, daily.dinner, DINNER) }
+    </div>
+  )
+
+  handleOrderButtonClicked = (name: string) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (![BREAKFAST, DINNER].includes(name)) {
+      return
+    }
+    const oldOrder = name === BREAKFAST ? this.props.menu.breakfast : this.props.menu.dinner
+    const order = {
+      ...oldOrder,
+      menu: {
+        ...Object.assign({}, oldOrder.menu),
+        ordered: !oldOrder.menu.ordered,
+      },
+    }
+    this.props.handleOrderChanged(name, order)
+  }
+
+  orderStatus = (classes: Record<any, string>, order: Order, name: string) => {
     const nothing = (<Button className={classes.orderButton}> </Button>)
 
     if (!order.menu.exists) {
@@ -104,7 +132,7 @@ class DailyMenu extends React.Component<Props> {
     }
 
     return (
-      <Button className={classes.orderButton} variant='outlined' color='primary'>
+      <Button className={classes.orderButton} variant={this.props.cancelable ? 'contained' : 'outlined'} color='primary' onClick={this.handleOrderButtonClicked(name)}>
         { order.menu.ordered ? '喫食' : '欠食' }
       </Button>
     )
@@ -125,14 +153,8 @@ class DailyMenu extends React.Component<Props> {
           { date.format('MM/DD') }({ jaWeekday(date.day()) })
         </Typography>
         <div className={classes.menuContainer}>
-          <div className={classes.cardContainer}>
-            { this.breakfast(classes, menu) }
-            { this.orderStatus(classes, menu.breakfast) }
-          </div>
-          <div className={classNames(classes.cardContainer, classes.right)}>
-            { this.dinner(classes, menu) }
-            { this.orderStatus(classes, menu.dinner) }
-          </div>
+          { this.breakfast(classes, menu) }
+          { this.dinner(classes, menu) }
         </div>
       </div>
     )

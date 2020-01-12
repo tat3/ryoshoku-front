@@ -1,8 +1,8 @@
 import React from 'react'
-import { Theme, withStyles, WithStyles, Typography } from '@material-ui/core'
+import { Theme, withStyles, WithStyles, Typography, Button } from '@material-ui/core'
 import moment from 'moment'
 
-import { MonthlySchedule } from '../types'
+import { MonthlySchedule, Order, BREAKFAST, DINNER } from '../types'
 import DailyMenu from './DailyMenu'
 import { SPACE } from '../defaultStyles'
 import { CSSProperties } from '@material-ui/core/styles/withStyles'
@@ -39,6 +39,11 @@ const styles = (theme: Theme) => ({
     height: refreshThreshold,
     textAlign: 'center'
   } as CSSProperties,
+  button: {
+    marginTop: theme.spacing(SPACE),
+    width: '100%',
+    height: 50
+  },
 })
 
 interface Props extends WithStyles<typeof styles>{
@@ -88,6 +93,8 @@ class Schedule extends React.Component<Props> {
     isPulled: false,
     isTouched: false,
     isLoading: false,
+    orderChanged: false,
+    isWaitingSync: false,
   }
 
   async componentDidMount() {
@@ -150,6 +157,7 @@ class Schedule extends React.Component<Props> {
   }
 
   async handleRefresh () {
+    this.setState({orderChanged: false})
     this.setState({isLoading: true})
     this.props.completeLoading(false)
 
@@ -192,6 +200,46 @@ class Schedule extends React.Component<Props> {
     }
   }
 
+  handleOrderChanged = (idx: number) => (name: string, order: Order) => {
+    if (![BREAKFAST, DINNER].includes(name)) {
+      return
+    }
+
+    if (!this.isCancelable(idx)) {
+      return
+    }
+
+    const newSchedule = this.state.schedule.slice()
+    newSchedule[idx] = Object.assign({}, newSchedule[idx])
+    if (name === BREAKFAST) {
+      newSchedule[idx].breakfast = order
+    } else {
+      newSchedule[idx].dinner = order
+    }
+
+    this.setState({schedule: newSchedule})
+    this.setState({orderChanged: true})
+  }
+
+  isCancelable = (idx: number) => {
+    const daily = this.state.schedule[idx]
+    return this.state.indexOfCancelableBar <= idx
+      && (daily.breakfast.menu.exists || daily.dinner.menu.exists)
+  }
+
+  handleOrderSubmit = async () => {
+    const user = this.userRepository.getStoredUser()
+    const dormitory = this.dormitoryRepository.getUsersDormitory()
+    this.setState({
+      isWaitingSync: true,
+    })
+    await this.scheduleRepository.syncUsersSchedule(user, dormitory, this.state.schedule)
+    this.setState({
+      isWaitingSync: false,
+      orderChanged: false,
+    })
+  }
+
   render () {
     const { classes } = this.props
     return (
@@ -201,14 +249,20 @@ class Schedule extends React.Component<Props> {
       <ul className={classes.list}>
         { this.state.schedule.slice(0, 7).map((s, i) => (
             <li key={i} className={classes.listItem}>
-              { this.state.indexOfCancelableBar <= i && (s.breakfast.menu.exists || s.dinner.menu.exists) ? (
+              { this.isCancelable(i) ? (
                 <Typography className={classes.limitText} align='left'>キャンセル可</Typography>
               ) : ''}
-              <DailyMenu menu={s} />
+              <DailyMenu menu={s} handleOrderChanged={this.handleOrderChanged(i)} cancelable={this.isCancelable(i)}/>
             </li>
           )) }
       </ul>
       }
+      { this.state.isWaitingSync ?
+        <div className={classes.loading}>
+          <img src='/image.gif' alt='loading' />
+        </div> : '' }
+      { this.state.orderChanged ?
+        <Button variant='contained' className={classes.button} color='primary' onClick={this.handleOrderSubmit}>注文</Button> : ''}
       </div>
     )
   }

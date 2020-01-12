@@ -9,17 +9,11 @@ import { IUser } from '../types/user'
 export interface IScheduleRepository {
   getStaticSchedule(isLoading: boolean): Promise<MonthlySchedule>,
   getUsersSchedule(user: IUser, dormitory: Dormitory): Promise<MonthlySchedule>,
+  syncUsersSchedule(user: IUser, dormitory: Dormitory, schedule: MonthlySchedule): void,
 }
 
 export class ScheduleRepository implements IScheduleRepository {
   private orderFromMenu = (menu: Menu, loading: boolean): Order => ({ menu, isLoading: loading })
-
-  private orderWithLoading = (menu: Menu) => {
-    return {
-      menu,
-      isLoading: true,
-    }
-  }
 
   private orderWithUnloading = (menu: Menu) => {
     return {
@@ -57,5 +51,23 @@ export class ScheduleRepository implements IScheduleRepository {
         breakfast: this.orderWithUnloading(s.breakfast),
         dinner: this.orderWithUnloading(s.dinner)
       }))
+  }
+
+  syncUsersSchedule = async (user: IUser, dormitory: Dormitory, schedule: MonthlySchedule) => {
+    if (user.isAnonymous()) {
+      throw Error('user is anonymous.')
+    }
+
+    const url = process.env.REACT_APP_API_URL + '/order'
+    await axios.post(url, {
+      username: user.usernameToken,
+      password: user.passwordToken,
+      dormitory: dormitory.key,
+      schedule: schedule.map(daily => ({
+        date: daily.date,
+        breakfast: daily.breakfast.menu.ordered,
+        dinner: daily.dinner.menu.ordered,
+      }))
+    })
   }
 }
