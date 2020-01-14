@@ -93,7 +93,6 @@ class Schedule extends React.Component<Props> {
     isPulled: false,
     isTouched: false,
     isLoading: false,
-    orderChanged: false,
     isWaitingSync: false,
   }
 
@@ -157,7 +156,6 @@ class Schedule extends React.Component<Props> {
   }
 
   async handleRefresh () {
-    this.setState({orderChanged: false})
     this.setState({isLoading: true})
     this.props.completeLoading(false)
 
@@ -218,7 +216,6 @@ class Schedule extends React.Component<Props> {
     }
 
     this.setState({schedule: newSchedule})
-    this.setState({orderChanged: true})
   }
 
   isCancelable = (idx: number) => {
@@ -236,8 +233,11 @@ class Schedule extends React.Component<Props> {
     await this.scheduleRepository.syncUsersSchedule(user, dormitory, this.state.schedule)
     this.setState({
       isWaitingSync: false,
-      orderChanged: false,
     })
+  }
+
+  orderIsChanged = () => {
+    return this.scheduleRepository.orderIsChanged(this.state.schedule)
   }
 
   render () {
@@ -247,11 +247,8 @@ class Schedule extends React.Component<Props> {
       <PullToRefreshArea message={this.state.refreshMessage} classes={classes}/>
       { this.state.isLoading ? <LoadingArea classes={classes} /> : 
       <ul className={classes.list}>
-        { this.state.schedule.slice(0, 7).map((s, i) => (
+        { this.state.schedule.slice(0, 14).map((s, i) => (
             <li key={i} className={classes.listItem}>
-              { this.isCancelable(i) ? (
-                <Typography className={classes.limitText} align='left'>キャンセル可</Typography>
-              ) : ''}
               <DailyMenu menu={s} handleOrderChanged={this.handleOrderChanged(i)} cancelable={this.isCancelable(i)}/>
             </li>
           )) }
@@ -261,7 +258,7 @@ class Schedule extends React.Component<Props> {
         <div className={classes.loading}>
           <img src='/image.gif' alt='loading' />
         </div> : '' }
-      { this.state.orderChanged ?
+      { this.orderIsChanged() ?
         <Button variant='contained' className={classes.button} color='primary' onClick={this.handleOrderSubmit}>注文</Button> : ''}
       </div>
     )
