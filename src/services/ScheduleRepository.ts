@@ -10,9 +10,18 @@ export interface IScheduleRepository {
   getStaticSchedule(isLoading: boolean): Promise<MonthlySchedule>,
   getUsersSchedule(user: IUser, dormitory: Dormitory): Promise<MonthlySchedule>,
   syncUsersSchedule(user: IUser, dormitory: Dormitory, schedule: MonthlySchedule): void,
+  orderIsChanged(newSchedule: MonthlySchedule): boolean,
 }
 
+const clone = <T>(original: T) => JSON.parse(JSON.stringify(original)) as T
+
 export class ScheduleRepository implements IScheduleRepository {
+  private originalSchedule: MonthlySchedule | null
+
+  constructor() {
+    this.originalSchedule = null
+  }
+
   private orderFromMenu = (menu: Menu, loading: boolean): Order => ({ menu, isLoading: loading })
 
   private orderWithUnloading = (menu: Menu) => {
@@ -45,12 +54,15 @@ export class ScheduleRepository implements IScheduleRepository {
       dormitory: dormitory.key,
     })).data.schedule
 
-    return scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
+    const schedule = scheduleAll.filter(s => isTodayOrFuture(moment(s.date), now))
       .map(s => ({
         date: s.date,
         breakfast: this.orderWithUnloading(s.breakfast),
         dinner: this.orderWithUnloading(s.dinner)
       }))
+    
+    this.originalSchedule = clone(schedule)
+    return schedule
   }
 
   syncUsersSchedule = async (user: IUser, dormitory: Dormitory, schedule: MonthlySchedule) => {
@@ -69,5 +81,25 @@ export class ScheduleRepository implements IScheduleRepository {
         dinner: daily.dinner.menu.ordered,
       }))
     })
+    this.originalSchedule = clone(schedule)
+  }
+
+  orderIsChanged(newSchedule: MonthlySchedule) {
+    if (this.originalSchedule === null) {
+      return false
+    }
+    if (this.originalSchedule.length !== newSchedule.length) {
+      return false
+    }
+    const res = this.originalSchedule.filter((daily, i) => {
+      if (daily.breakfast.menu.ordered !== newSchedule[i].breakfast.menu.ordered) {
+        return true
+      }
+      if (daily.dinner.menu.ordered !== newSchedule[i].dinner.menu.ordered) {
+        return true
+      }
+      return false
+    })
+    return res.length > 0
   }
 }
