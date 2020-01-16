@@ -132,7 +132,8 @@ class DailyMenu extends React.Component<Props> {
     }
 
     return (
-      <Button className={classes.orderButton} variant={this.props.cancelable ? 'contained' : 'outlined'} color='primary' onClick={this.handleOrderButtonClicked(name)}>
+      <Button className={classes.orderButton} variant={this.props.cancelable ? 'contained' : 'outlined'}
+       color={ order.menu.ordered ? 'primary' : 'secondary' } onClick={this.handleOrderButtonClicked(name)}>
         { order.menu.ordered ? '喫食' : '欠食' }
       </Button>
     )
